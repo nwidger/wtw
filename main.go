@@ -66,6 +66,9 @@ func main() {
 	}
 	tempInt = neg * (5 * (int(math.Abs(float64(tempInt))) / 5))
 	temp := strconv.Itoa(tempInt)
+	if temp == "0" {
+		temp = "zero"
+	}
 
 	answers := map[string]*answer{}
 	err := loadAnswers(answers)
