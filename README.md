@@ -4,6 +4,8 @@ wtw
 `wtw` tell you what to wear on your run based on the current weather
 and the type of run.  It uses data collected from Runner's
 World's [What to Wear](http://www.runnersworld.com/what-to-wear) page.
+Weather data retrieved with `-location`
+is [Powered by Yahoo!](https://www.yahoo.com/?ilc=401).
 
 ## Usage
 
@@ -17,21 +19,59 @@ Usage of wtw:
     	m (male) or f (female) (default "m")
   -intensity string
     	n (easy run), lr (long run), h (hard workout) or r (race) (default "n")
+  -location string
+    	get current conditions for location, overrides -temp, -conditions and -wind
   -temp int
     	temp (°F) (default 60)
   -time string
-    	dawn, day, dusk or night (default "day")
+    	dawn, day, dusk, night or current (default "current")
+  -v	print conditions before answer
   -wind string
     	nw (now win), lw (light wind), hw (heavy wind) (default "nw")
 ```
 
 ## Example
 
+With `-location`, `wtw` will retrieve the current weather from your
+current location.  You only need to specify `-gender`, `-intensity`,
+and `-feeel`:
+
 ```
-$ wtw -gender m -temp 60 -conditions c -wind nw -time day -intensity n -feel ib
+$ wtw -gender m -location 03801 -intensity n -feel -ib
 Sunglasses
 Singlet
 Shorts
+Running Shoes
+Sunblock
+```
+
+Without `-location`, you will need to specify `-temp`, `-conditions`
+and `-wind` as well:
+
+```
+$ wtw -gender m -temp 60 -conditions c -wind nw -intensity n -feel ib
+Sunglasses
+Singlet
+Shorts
+Running Shoes
+Sunblock
+```
+
+Most users will not need to specify `-time` as its value is
+automatically selected based on the current time.
+
+Specifying `-v` will cause `wtw` to print the conditions before the
+answer:
+
+```
+$ wtw -location 03820 -intensity lr -v
+wtw -gender m -temp 20 -conditions c -wind hw -time day -intensity lr -feel ib
+Winter Cap
+Sunglasses
+Heavy Jacket
+Long-Sleeve Shirt
+Gloves
+Tights
 Running Shoes
 Sunblock
 ```
