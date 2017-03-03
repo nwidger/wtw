@@ -218,9 +218,10 @@ func main() {
 		Intensity:  "n",
 		Feel:       "ib",
 	}
-	location := "Portsmouth, NH"
+	location := ""
+	verbose := false
 
-	flag.StringVar(&location, "location", location, "get current conditions for location, overrides -temp, -conditions, -wind")
+	flag.StringVar(&location, "location", location, "get current conditions for location, overrides -temp, -conditions and -wind")
 	flag.StringVar(&a.Gender, "gender", a.Gender, "m (male) or f (female)")
 	flag.IntVar(&a.TempInt, "temp", a.TempInt, "temp (°F)")
 	flag.StringVar(&a.Conditions, "conditions", a.Conditions, "c (clear), pc (partly cloudy), o (overcast), r (heavy rain), lr (light rain) or s (snowing)")
@@ -228,7 +229,7 @@ func main() {
 	flag.StringVar(&a.Time, "time", a.Time, "dawn, day, dusk, night or current")
 	flag.StringVar(&a.Intensity, "intensity", a.Intensity, "n (easy run), lr (long run), h (hard workout) or r (race)")
 	flag.StringVar(&a.Feel, "feel", a.Feel, "c (cool), ib (in between) or w (warm)")
-	verbose := flag.Bool("v", false, "print conditions before answer")
+	flag.BoolVar(&verbose, "v", verbose, "print conditions before answer")
 
 	flag.Parse()
 
@@ -261,7 +262,7 @@ func main() {
 		os.Exit(1)
 	}
 
-	if *verbose {
+	if verbose {
 		fmt.Printf("wtw -gender %s -temp %s -conditions %s -wind %s -time %s -intensity %s -feel %s\n",
 			a.Gender, a.Temp, a.Conditions,
 			a.Wind, a.Time, a.Intensity, a.Feel)
