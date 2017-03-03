@@ -37,7 +37,7 @@ current location.  You only need to specify `-gender`, `-intensity`,
 and `-feeel`:
 
 ```
-$ wtw -gender m -location 03801 -intensity n -feel -ib
+$ wtw -gender m -location 03801 -intensity n -feel ib
 Sunglasses
 Singlet
 Shorts
