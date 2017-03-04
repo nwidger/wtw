@@ -34,7 +34,7 @@ Usage of wtw:
 
 With `-location`, `wtw` will retrieve the current weather from your
 current location.  You only need to specify `-gender`, `-intensity`,
-and `-feeel`:
+and `-feel`:
 
 ```
 $ wtw -gender m -location 03801 -intensity n -feel ib
@@ -65,7 +65,7 @@ answer:
 
 ```
 $ wtw -location 03820 -intensity lr -v
-wtw -gender m -temp 20 -conditions c -wind hw -time day -intensity lr -feel ib
+gender m temp 20 conditions c wind hw time day intensity lr feel ib
 Winter Cap
 Sunglasses
 Heavy Jacket
