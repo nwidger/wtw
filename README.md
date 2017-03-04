@@ -33,7 +33,7 @@ Usage of wtw:
     	dawn, day, dusk, night or current (default "current")
   -v	print conditions before answer
   -wind string
-    	nw (now win), lw (light wind), hw (heavy wind) (default "nw")
+    	nw (no wind), lw (light wind), hw (heavy wind) (default "nw")
 ```
 
 ## Example
