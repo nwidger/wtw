@@ -1,11 +1,17 @@
 wtw
 ===
 
-`wtw` tell you what to wear on your run based on the current weather
+`wtw` tells you what to wear on your run based on the current weather
 and the type of run.  It uses data collected from Runner's
 World's [What to Wear](http://www.runnersworld.com/what-to-wear) page.
 Weather data retrieved with `-location`
 is [Powered by Yahoo!](https://www.yahoo.com/?ilc=401).
+
+## Installation
+
+```
+$ go get -u github.com/nwidger/wtw/cmd/wtw
+```
 
 ## Usage
 
@@ -37,7 +43,7 @@ current location.  You only need to specify `-gender`, `-intensity`,
 and `-feel`:
 
 ```
-$ wtw -gender m -location 03801 -intensity n -feel ib
+$ wtw -location 03801 -gender m -intensity n -feel ib
 Sunglasses
 Singlet
 Shorts
@@ -49,7 +55,7 @@ Without `-location`, you will need to specify `-temp`, `-conditions`
 and `-wind` as well:
 
 ```
-$ wtw -gender m -temp 60 -conditions c -wind nw -intensity n -feel ib
+$ wtw -temp 60 -conditions c -wind nw -gender m -intensity n -feel ib
 Sunglasses
 Singlet
 Shorts
@@ -64,7 +70,7 @@ Specifying `-v` will cause `wtw` to print the conditions before the
 answer:
 
 ```
-$ wtw -location 03820 -intensity lr -v
+$ wtw -location 03820 -v
 gender m temp 20 conditions c wind hw time day intensity lr feel ib
 Winter Cap
 Sunglasses

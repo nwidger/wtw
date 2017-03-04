@@ -1,23 +1,19 @@
-package main
+package wtw
 
 import (
 	"bytes"
 	"compress/gzip"
 	"encoding/json"
-	"flag"
 	"fmt"
 	"io"
 	"io/ioutil"
-	"math"
 	"net/http"
 	"net/url"
-	"os"
-	"strconv"
 	"strings"
 	"time"
 )
 
-type answer struct {
+type Answer struct {
 	Gender     string   `json:"gender"`
 	Temp       string   `json:"temp"`
 	TempInt    int      `json:"-"`
@@ -29,7 +25,8 @@ type answer struct {
 	Clothes    []string `json:"clothes"`
 }
 
-func loadAnswers(answers map[string]*answer) error {
+//go:generate go-bindata -pkg wtw -o answers.go answers.gz
+func LoadAnswers(answers map[string]*Answer) error {
 	buf, err := Asset("answers.gz")
 	if err != nil {
 		return err
@@ -50,7 +47,19 @@ func loadAnswers(answers map[string]*answer) error {
 	return nil
 }
 
-func getTime() string {
+func GetAnswer(a *Answer, answers map[string]*Answer) ([]string, error) {
+	answer, ok := answers[strings.Join([]string{
+		a.Gender, a.Temp, a.Conditions,
+		a.Wind, a.Time, a.Intensity, a.Feel,
+	}, ",")]
+	if !ok {
+		return nil, fmt.Errorf("no answer")
+	}
+
+	return answer.Clothes, nil
+}
+
+func GetTime() string {
 	now := time.Now()
 	hour := now.Hour()
 	switch {
@@ -150,7 +159,7 @@ func getConditions(code int) (string, error) {
 	return condition, nil
 }
 
-func getWeather(location string, a *answer) error {
+func GetWeather(location string, a *Answer) error {
 	u, err := url.Parse("https://query.yahooapis.com/v1/public/yql")
 	if err != nil {
 		return err
@@ -205,79 +214,4 @@ func getWeather(location string, a *answer) error {
 	}
 
 	return nil
-}
-
-//go:generate go-bindata -o answers.go answers.gz
-func main() {
-	a := &answer{
-		Gender:     "m",
-		TempInt:    60,
-		Conditions: "c",
-		Wind:       "nw",
-		Time:       "current",
-		Intensity:  "n",
-		Feel:       "ib",
-	}
-	location := ""
-	verbose := false
-
-	flag.StringVar(&location, "location", location, "get current conditions for location, overrides -temp, -conditions and -wind")
-	flag.StringVar(&a.Gender, "gender", a.Gender, "m (male) or f (female)")
-	flag.IntVar(&a.TempInt, "temp", a.TempInt, "temp (°F)")
-	flag.StringVar(&a.Conditions, "conditions", a.Conditions, "c (clear), pc (partly cloudy), o (overcast), r (heavy rain), lr (light rain) or s (snowing)")
-	flag.StringVar(&a.Wind, "wind", a.Wind, "nw (now win), lw (light wind), hw (heavy wind)")
-	flag.StringVar(&a.Time, "time", a.Time, "dawn, day, dusk, night or current")
-	flag.StringVar(&a.Intensity, "intensity", a.Intensity, "n (easy run), lr (long run), h (hard workout) or r (race)")
-	flag.StringVar(&a.Feel, "feel", a.Feel, "c (cool), ib (in between) or w (warm)")
-	flag.BoolVar(&verbose, "v", verbose, "print conditions before answer")
-
-	flag.Parse()
-
-	if a.Time == "current" {
-		a.Time = getTime()
-	}
-
-	if len(location) > 0 {
-		err := getWeather(location, a)
-		if err != nil {
-			fmt.Fprintf(os.Stderr, "error loading current conditions: %s\n", err.Error())
-			os.Exit(1)
-		}
-	}
-
-	neg := 1
-	if a.TempInt < 0 {
-		neg = -1
-	}
-	a.TempInt = neg * (5 * (int(math.Abs(float64(a.TempInt))) / 5))
-	a.Temp = strconv.Itoa(a.TempInt)
-	if a.Temp == "0" {
-		a.Temp = "zero"
-	}
-
-	answers := map[string]*answer{}
-	err := loadAnswers(answers)
-	if err != nil {
-		fmt.Fprintf(os.Stderr, "error loading answers: %s\n", err.Error())
-		os.Exit(1)
-	}
-
-	if verbose {
-		fmt.Printf("gender %s temp %s conditions %s wind %s time %s intensity %s feel %s\n",
-			a.Gender, a.Temp, a.Conditions,
-			a.Wind, a.Time, a.Intensity, a.Feel)
-	}
-
-	answer, ok := answers[strings.Join([]string{
-		a.Gender, a.Temp, a.Conditions,
-		a.Wind, a.Time, a.Intensity, a.Feel,
-	}, ",")]
-	if !ok {
-		fmt.Println("no answer")
-		os.Exit(1)
-	}
-
-	for _, c := range answer.Clothes {
-		fmt.Printf("%s\n", c)
-	}
 }

@@ -1,4 +1,4 @@
-package main
+package wtw
 
 import (
 	"bytes"
@@ -76,7 +76,7 @@ func answers_gz() (*asset, error) {
 		return nil, err
 	}
 
-	info := bindata_file_info{name: "answers.gz", size: 224174, mode: os.FileMode(420), modTime: time.Unix(1487971106, 0)}
+	info := bindata_file_info{name: "answers.gz", size: 224174, mode: os.FileMode(420), modTime: time.Unix(1487973659, 0)}
 	a := &asset{bytes: bytes, info:  info}
 	return a, nil
 }
