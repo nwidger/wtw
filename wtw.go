@@ -1,7 +1,6 @@
 package wtw
 
 import (
-	"bytes"
 	"compress/gzip"
 	"encoding/json"
 	"fmt"
@@ -9,6 +8,8 @@ import (
 	"io/ioutil"
 	"net/http"
 	"net/url"
+	"os"
+	"regexp"
 	"strings"
 	"time"
 )
@@ -25,14 +26,14 @@ type Answer struct {
 	Clothes    []string `json:"clothes"`
 }
 
-//go:generate go-bindata -pkg wtw -o answers.go answers.gz
-func LoadAnswers(answers map[string]*Answer) error {
-	buf, err := Asset("answers.gz")
+func LoadSavedAnswers(path string, answers map[string]*Answer) error {
+	f, err := os.Open(path)
 	if err != nil {
 		return err
 	}
+	defer f.Close()
 
-	gr, err := gzip.NewReader(bytes.NewBuffer(buf))
+	gr, err := gzip.NewReader(f)
 	if err != nil {
 		return err
 	}
@@ -47,7 +48,7 @@ func LoadAnswers(answers map[string]*Answer) error {
 	return nil
 }
 
-func GetAnswer(a *Answer, answers map[string]*Answer) ([]string, error) {
+func GetSavedAnswer(a *Answer, answers map[string]*Answer) ([]string, error) {
 	answer, ok := answers[strings.Join([]string{
 		a.Gender, a.Temp, a.Conditions,
 		a.Wind, a.Time, a.Intensity, a.Feel,
@@ -57,6 +58,61 @@ func GetAnswer(a *Answer, answers map[string]*Answer) ([]string, error) {
 	}
 
 	return answer.Clothes, nil
+}
+
+var answerRegexp = regexp.MustCompile(`<strong><a href="[^"]+">(?P<text>[^<]+)</a></strong>`)
+
+func GetAnswer(a *Answer) ([]string, error) {
+	u, err := url.Parse("http://www.runnersworld.com/what-to-wear")
+	if err != nil {
+		return nil, err
+	}
+
+	v := url.Values{}
+	v.Set("g", a.Gender)
+	v.Set("temp", a.Temp)
+	v.Set("conditions", a.Conditions)
+	v.Set("wind", a.Wind)
+	v.Set("time", a.Time)
+	v.Set("intensity", a.Intensity)
+	v.Set("feel", a.Feel)
+	u.RawQuery = v.Encode()
+
+	req, err := http.NewRequest("GET", u.String(), nil)
+	if err != nil {
+		return nil, err
+	}
+	req.Header.Set("Access-Control-Allow-Origin", "no-cors")
+
+	client := &http.Client{}
+	resp, err := client.Do(req)
+	if err != nil {
+		return nil, err
+	}
+	defer resp.Body.Close()
+	defer io.Copy(ioutil.Discard, resp.Body)
+
+	buf, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		return nil, err
+	}
+
+	ms := answerRegexp.FindAllStringSubmatchIndex(string(buf), -1)
+	if ms == nil {
+		return nil, fmt.Errorf("no answer")
+	}
+
+	names := answerRegexp.SubexpNames()
+	clothes := []string{}
+
+	for i, m := range ms {
+		switch names[i] {
+		case "text":
+			clothes = append(clothes, string(m[i]))
+		}
+	}
+
+	return clothes, nil
 }
 
 func GetTime() string {

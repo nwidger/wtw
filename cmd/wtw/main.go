@@ -57,20 +57,13 @@ func main() {
 		a.Temp = "zero"
 	}
 
-	answers := map[string]*wtw.Answer{}
-	err := wtw.LoadAnswers(answers)
-	if err != nil {
-		fmt.Fprintf(os.Stderr, "error loading answers: %s\n", err.Error())
-		os.Exit(1)
-	}
-
 	if verbose {
 		fmt.Printf("gender %s temp %s conditions %s wind %s time %s intensity %s feel %s\n",
 			a.Gender, a.Temp, a.Conditions,
 			a.Wind, a.Time, a.Intensity, a.Feel)
 	}
 
-	clothes, err := wtw.GetAnswer(a, answers)
+	clothes, err := wtw.GetAnswer(a)
 	if err != nil {
 		fmt.Println(err)
 		os.Exit(1)
