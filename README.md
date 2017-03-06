@@ -71,7 +71,7 @@ answer:
 
 ```
 $ wtw -location 03820 -v
-gender m temp 20 conditions c wind hw time day intensity lr feel ib
+wtw -gender m -temp 20 -conditions c -wind hw -time day -intensity lr -feel ib -v
 Winter Cap
 Sunglasses
 Heavy Jacket
@@ -82,3 +82,6 @@ Running Shoes
 Sunblock
 ```
 
+This can be useful if for some reason the conditions determined by
+`-location` or `-time current` don't quite match up with what you were
+expecting.

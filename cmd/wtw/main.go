@@ -58,7 +58,7 @@ func main() {
 	}
 
 	if verbose {
-		fmt.Printf("gender %s temp %s conditions %s wind %s time %s intensity %s feel %s\n",
+		fmt.Printf("wtw -gender %s -temp %s -conditions %s -wind %s -time %s -intensity %s -feel %s -v\n",
 			a.Gender, a.Temp, a.Conditions,
 			a.Wind, a.Time, a.Intensity, a.Feel)
 	}

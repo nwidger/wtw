@@ -82,7 +82,6 @@ func GetAnswer(a *Answer) ([]string, error) {
 	if err != nil {
 		return nil, err
 	}
-	req.Header.Set("Access-Control-Allow-Origin", "no-cors")
 
 	client := &http.Client{}
 	resp, err := client.Do(req)
@@ -91,6 +90,10 @@ func GetAnswer(a *Answer) ([]string, error) {
 	}
 	defer resp.Body.Close()
 	defer io.Copy(ioutil.Discard, resp.Body)
+
+	if resp.StatusCode != http.StatusOK {
+		return nil, fmt.Errorf("no answer: %s", http.StatusText(resp.StatusCode))
+	}
 
 	buf, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
