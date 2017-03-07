@@ -60,7 +60,7 @@ func GetSavedAnswer(a *Answer, answers map[string]*Answer) ([]string, error) {
 	return answer.Clothes, nil
 }
 
-var answerRegexp = regexp.MustCompile(`<strong><a href="[^"]+">(?P<text>[^<]+)</a></strong>`)
+var answerRegexp = regexp.MustCompile(`<strong><a href="[^"]+">([^<]+)</a></strong>`)
 
 func GetAnswer(a *Answer) ([]string, error) {
 	u, err := url.Parse("http://www.runnersworld.com/what-to-wear")
@@ -69,7 +69,7 @@ func GetAnswer(a *Answer) ([]string, error) {
 	}
 
 	v := url.Values{}
-	v.Set("g", a.Gender)
+	v.Set("gender", a.Gender)
 	v.Set("temp", a.Temp)
 	v.Set("conditions", a.Conditions)
 	v.Set("wind", a.Wind)
@@ -100,19 +100,15 @@ func GetAnswer(a *Answer) ([]string, error) {
 		return nil, err
 	}
 
-	ms := answerRegexp.FindAllStringSubmatchIndex(string(buf), -1)
-	if ms == nil {
-		return nil, fmt.Errorf("no answer")
-	}
-
-	names := answerRegexp.SubexpNames()
 	clothes := []string{}
 
-	for i, m := range ms {
-		switch names[i] {
-		case "text":
-			clothes = append(clothes, string(m[i]))
-		}
+	ms := answerRegexp.FindAllStringSubmatch(string(buf), -1)
+	if ms == nil {
+		return nil, fmt.Errorf("no answer: no matches")
+	}
+
+	for _, m := range ms {
+		clothes = append(clothes, string(m[1]))
 	}
 
 	return clothes, nil
