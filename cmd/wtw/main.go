@@ -3,17 +3,15 @@ package main
 import (
 	"flag"
 	"fmt"
-	"math"
 	"os"
-	"strconv"
 
 	"github.com/nwidger/wtw"
 )
 
 func main() {
-	a := &wtw.Answer{
+	a := &wtw.Conditions{
 		Gender:     "m",
-		TempInt:    60,
+		Temp:       60,
 		Conditions: "c",
 		Wind:       "nw",
 		Time:       "current",
@@ -25,7 +23,7 @@ func main() {
 
 	flag.StringVar(&location, "location", location, "get current conditions for location, overrides -temp, -conditions and -wind")
 	flag.StringVar(&a.Gender, "gender", a.Gender, "m (male) or f (female)")
-	flag.IntVar(&a.TempInt, "temp", a.TempInt, "temp (°F)")
+	flag.IntVar(&a.Temp, "temp", a.Temp, "temp (°F)")
 	flag.StringVar(&a.Conditions, "conditions", a.Conditions, "c (clear), pc (partly cloudy), o (overcast), r (heavy rain), lr (light rain) or s (snowing)")
 	flag.StringVar(&a.Wind, "wind", a.Wind, "nw (no wind), lw (light wind), hw (heavy wind)")
 	flag.StringVar(&a.Time, "time", a.Time, "dawn, day, dusk, night or current")
@@ -35,8 +33,11 @@ func main() {
 
 	flag.Parse()
 
-	if a.Time == "current" {
-		a.Time = wtw.GetTime()
+	err := a.Validate()
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "%s\n", err.Error())
+		flag.Usage()
+		os.Exit(1)
 	}
 
 	if len(location) > 0 {
@@ -47,23 +48,13 @@ func main() {
 		}
 	}
 
-	neg := 1
-	if a.TempInt < 0 {
-		neg = -1
-	}
-	a.TempInt = neg * (5 * (int(math.Abs(float64(a.TempInt))) / 5))
-	a.Temp = strconv.Itoa(a.TempInt)
-	if a.Temp == "0" {
-		a.Temp = "zero"
-	}
-
 	if verbose {
-		fmt.Printf("wtw -gender %s -temp %s -conditions %s -wind %s -time %s -intensity %s -feel %s -v\n",
+		fmt.Printf("wtw -gender %s -temp %d -conditions %s -wind %s -time %s -intensity %s -feel %s -v\n",
 			a.Gender, a.Temp, a.Conditions,
 			a.Wind, a.Time, a.Intensity, a.Feel)
 	}
 
-	clothes, err := wtw.GetAnswer(a)
+	clothes, err := wtw.GetClothes(a)
 	if err != nil {
 		fmt.Println(err)
 		os.Exit(1)

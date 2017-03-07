@@ -1,76 +1,83 @@
 package wtw
 
 import (
-	"compress/gzip"
 	"encoding/json"
 	"fmt"
 	"io"
 	"io/ioutil"
+	"math"
 	"net/http"
 	"net/url"
-	"os"
 	"regexp"
-	"strings"
+	"strconv"
 	"time"
 )
 
-type Answer struct {
-	Gender     string   `json:"gender"`
-	Temp       string   `json:"temp"`
-	TempInt    int      `json:"-"`
-	Conditions string   `json:"conditions"`
-	Wind       string   `json:"wind"`
-	Time       string   `json:"time"`
-	Intensity  string   `json:"intensity"`
-	Feel       string   `json:"feel"`
-	Clothes    []string `json:"clothes"`
+type Conditions struct {
+	Gender     string `json:"gender"`
+	Temp       int    `json:"temp"`
+	Conditions string `json:"conditions"`
+	Wind       string `json:"wind"`
+	Time       string `json:"time"`
+	Intensity  string `json:"intensity"`
+	Feel       string `json:"feel"`
 }
 
-func LoadSavedAnswers(path string, answers map[string]*Answer) error {
-	f, err := os.Open(path)
-	if err != nil {
-		return err
-	}
-	defer f.Close()
-
-	gr, err := gzip.NewReader(f)
-	if err != nil {
-		return err
+func (a *Conditions) Validate() error {
+	switch a.Gender {
+	case "m", "f":
+	default:
+		return fmt.Errorf("invalid value for -gender: must be m or f")
 	}
 
-	dec := json.NewDecoder(gr)
+	switch a.Conditions {
+	case "c", "pc", "o", "r", "lr", "s":
+	default:
+		return fmt.Errorf("invalid value for -conditions: must be c, pc, o, r, lr or s")
+	}
 
-	err = dec.Decode(&answers)
-	if err != nil {
-		return err
+	switch a.Wind {
+	case "nw", "lw", "hw":
+	default:
+		return fmt.Errorf("invalid value for -wind: must be nw, lw or hw")
+	}
+
+	switch a.Time {
+	case "dawn", "day", "dusk", "night", "current":
+	default:
+		return fmt.Errorf("invalid value for -time: must be dawn, day, dusk or night")
+	}
+
+	switch a.Intensity {
+	case "n", "lr", "h", "r":
+	default:
+		return fmt.Errorf("invalid value for -intensity: must be n, lr, h or r")
+	}
+
+	switch a.Feel {
+	case "c", "ib", "w":
+	default:
+		return fmt.Errorf("invalid value for -feel: must be c, ib or w")
 	}
 
 	return nil
 }
 
-func GetSavedAnswer(a *Answer, answers map[string]*Answer) ([]string, error) {
-	answer, ok := answers[strings.Join([]string{
-		a.Gender, a.Temp, a.Conditions,
-		a.Wind, a.Time, a.Intensity, a.Feel,
-	}, ",")]
-	if !ok {
-		return nil, fmt.Errorf("no answer")
-	}
-
-	return answer.Clothes, nil
-}
-
 var answerRegexp = regexp.MustCompile(`<strong><a href="[^"]+">([^<]+)</a></strong>`)
 
-func GetAnswer(a *Answer) ([]string, error) {
+func GetClothes(a *Conditions) ([]string, error) {
 	u, err := url.Parse("http://www.runnersworld.com/what-to-wear")
 	if err != nil {
 		return nil, err
 	}
 
+	if a.Time == "current" {
+		a.Time = GetTime()
+	}
+
 	v := url.Values{}
 	v.Set("gender", a.Gender)
-	v.Set("temp", a.Temp)
+	v.Set("temp", GetTemp(a.Temp))
 	v.Set("conditions", a.Conditions)
 	v.Set("wind", a.Wind)
 	v.Set("time", a.Time)
@@ -112,6 +119,20 @@ func GetAnswer(a *Answer) ([]string, error) {
 	}
 
 	return clothes, nil
+}
+
+func GetTemp(temp int) string {
+	neg := 1
+	if temp < 0 {
+		neg = -1
+	}
+	temp = neg * (5 * (int(math.Abs(float64(temp))) / 5))
+	tempStr := strconv.Itoa(temp)
+	if tempStr == "0" {
+		tempStr = "zero"
+	}
+
+	return tempStr
 }
 
 func GetTime() string {
@@ -214,7 +235,7 @@ func getConditions(code int) (string, error) {
 	return condition, nil
 }
 
-func GetWeather(location string, a *Answer) error {
+func GetWeather(location string, a *Conditions) error {
 	u, err := url.Parse("https://query.yahooapis.com/v1/public/yql")
 	if err != nil {
 		return err
@@ -261,7 +282,7 @@ func GetWeather(location string, a *Answer) error {
 		return err
 	}
 
-	a.TempInt = data.Query.Results.Channel.Item.Condition.Temp
+	a.Temp = data.Query.Results.Channel.Item.Condition.Temp
 	a.Wind = getWind(data.Query.Results.Channel.Wind.Speed)
 	a.Conditions, err = getConditions(data.Query.Results.Channel.Item.Condition.Code)
 	if err != nil {
