@@ -278,6 +278,7 @@ func GetWeather(location string, a *Conditions) error {
 
 	data := struct {
 		Query struct {
+			Count   int `json:"count"`
 			Results struct {
 				Channel struct {
 					Wind struct {
@@ -299,6 +300,10 @@ func GetWeather(location string, a *Conditions) error {
 	err = dec.Decode(&data)
 	if err != nil {
 		return err
+	}
+
+	if data.Query.Count == 0 {
+		return fmt.Errorf("invalid location")
 	}
 
 	a.Temp = data.Query.Results.Channel.Item.Condition.Temp

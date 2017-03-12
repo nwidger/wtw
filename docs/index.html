@@ -11,13 +11,20 @@
 	<form onsubmit="return getClothes()">
 	    <div class="row">
 		<div class="small-6 columns">
-		    <h2>wtw</h2>
+		    <div class="row">
+			<div class="small-6 columns">
+			    <h3>wtw</h3>
+			</div>
+			<div class="small-6 columns">
+			    <p class="text-right"><small><a href="https://github.com/nwidger/wtw">Source</a></small></p>
+			</div>
+		    </div>
 
 		    <label>Location
 			<input type="text" id="location" placeholder="city, state or zip code">
 		    </label>
 
-		    <hr/>
+		    <hr>
 
 		    <label>Gender
 			<select id="gender">
@@ -54,7 +61,7 @@
 		    </label>
 
 		    <span style="display:none">
-			<hr/>
+			<hr>
 
 			<label>Temperature
 			    <input type="number" id="temp" placeholder="Temperature (F)" aria-describedby="tempHelpText">

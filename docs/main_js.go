@@ -3,7 +3,7 @@
 package main
 
 import (
-	"log"
+	"fmt"
 
 	"strconv"
 
@@ -18,10 +18,19 @@ func getClothes() bool {
 			err     error
 		)
 
+		alert := func(message string) {
+			js.Global.Call("alert", message)
+		}
+
 		document := js.Global.Get("document")
 
 		locationElem := document.Call("getElementById", "location")
 		location := locationElem.Get("value").String()
+
+		if len(location) == 0 {
+			alert(fmt.Sprintf("Please enter your location"))
+			return
+		}
 
 		genderElem := document.Call("getElementById", "gender")
 		gender := genderElem.Get("value").String()
@@ -47,7 +56,8 @@ func getClothes() bool {
 		if len(temp) > 0 {
 			tempInt, err = strconv.Atoi(temp)
 			if err != nil {
-				log.Fatal(err)
+				alert(fmt.Sprintf("Invalid temperature: %s", err.Error()))
+				return
 			}
 		}
 
@@ -66,12 +76,17 @@ func getClothes() bool {
 		}
 
 		if len(location) > 0 {
-			wtw.GetWeather(location, a)
+			err = wtw.GetWeather(location, a)
+			if err != nil {
+				alert(fmt.Sprintf("Error getting weather data: %s", err.Error()))
+				return
+			}
 		}
 
 		u, err := wtw.GetClothesURL(a)
 		if err != nil {
-			log.Fatal(err)
+			alert(fmt.Sprintf("Error constructing URL: %s", err.Error()))
+			return
 		}
 
 		document.Set("location", u.String())
