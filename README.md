@@ -4,14 +4,43 @@ wtw
 `wtw` tells you what to wear on your run based on the current weather
 and the type of run.  It uses data collected from Runner's
 World's [What to Wear](http://www.runnersworld.com/what-to-wear) page.
-Weather data retrieved with `-location`
-is [Powered by Yahoo!](https://www.yahoo.com/?ilc=401).
+Weather data is [Powered by Yahoo!](https://www.yahoo.com/?ilc=401).
 
-## Installation
+## Try it out online
+
+Try out the Javascript version of wtw in your
+browser [here](https://nwidger.github.io/wtw).
+
+## Build
+
+### Mac OS X/Linux/Windows
 
 ```
 $ go get -u github.com/nwidger/wtw/cmd/wtw
 ```
+
+### Javascript
+
+1. Install [GopherJS](https://github.com/gopherjs/gopherjs)
+
+   ```
+   go get -u github.com/gopherjs/gopherjs
+   ```
+
+2. Download wtw
+
+   ```
+   go get -d -u github.com/nwidger/wtw
+   ```
+
+3. Build `docs/main_js.js`
+
+   ```
+   cd $GOPATH/src/github.com/nwidger/wtw
+   GOARCH=js gopherjs build github.com/nwidger/wtw/docs -m -o docs/main_js.js
+   ```
+
+4. Open `docs/index.html` in your browser.
 
 ## Usage
 
