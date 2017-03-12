@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html class="no-js" lang="en">
+    <head>
+	<meta charset="utf-8" />
+	<meta http-equiv="x-ua-compatible" content="ie=edge">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+	<title>wtw</title>
+	<link rel="stylesheet" href="css/foundation.css" />
+    </head>
+    <body>
+	<div class="row">
+	    <div class="small-6 columns">
+		<h2>wtw</h2>
+
+		<label>Location
+		    <input type="text" id="location" placeholder="city, state or zip code">
+		</label>
+
+		<hr/>
+
+		<label>Gender
+		    <select id="gender">
+			<option value="m">Male</option>
+			<option value="f">Female</option>
+		    </select>
+		</label>
+
+		<label>Time
+		    <select id="time">
+			<option value="current">Current</option>
+			<option value="dawn">Dawn</option>
+			<option value="day">Day</option>
+			<option value="dusk">Dusk</option>
+			<option value="night">Night</option>
+		    </select>
+		</label>
+
+		<label>Intensity
+		    <select id="intensity">
+			<option value="n">Easy Run</option>
+			<option value="lr">Long Run</option>
+			<option value="h">Hard Workout</option>
+			<option value="r">Race</option>
+		    </select>
+		</label>
+
+		<label>Feel
+		    <select id="feel">
+			<option value="c">Cool</option>
+			<option value="ib">In Between</option>
+			<option value="w">Warm</option>
+		    </select>
+		</label>
+
+		<span style="display:none">
+		    <hr/>
+
+		    <label>Temperature
+			<input type="number" id="temp" placeholder="Temperature (F)" aria-describedby="tempHelpText">
+		    </label>
+		    <p class="help-text" id="tempHelpText">Ignored if Location specified</p>
+
+		    <label>Conditions
+			<select id="conditions" aria-describedby="conditionsHelpText">
+			    <option value="c">Clear</option>
+			    <option value="pc">Partly Cloudy</option>
+			    <option value="o">Overcast</option>
+			    <option value="r">Heavy Rain</option>
+			    <option value="lr">Light Rain</option>
+			    <option value="s">Snowing</option>
+			</select>
+		    </label>
+		    <p class="help-text" id="conditionsHelpText">Ignored if Location specified</p>
+
+		    <label>Wind
+			<select id="wind" aria-describedby="windHelpText">
+			    <option value="nw">No Wind</option>
+			    <option value="lw">Light Wind</option>
+			    <option value="hw">Heavy Wind</option>
+			</select>
+		    </label>
+		    <p class="help-text" id="windHelpText">Ignored if Location specified</p>
+		</span>
+
+		<div class="row">
+		    <div class="small-3 small-centered columns">
+			<a class="button" href="#" id="submit">Submit</a>
+		    </div>
+		</div>
+	    </div>
+	</div>
+
+
+	<script type="text/javascript" src="main_js.js"></script>
+	<script src="js/vendor/jquery.js"></script>
+	<script src="js/vendor/what-input.js"></script>
+	<script src="js/vendor/foundation.min.js"></script>
+	<script>
+	 $(document).foundation();
+	</script>
+    </body>
+</html>
