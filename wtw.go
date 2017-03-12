@@ -65,14 +65,33 @@ func (a *Conditions) Validate() error {
 
 var answerRegexp = regexp.MustCompile(`<strong><a href="[^"]+">([^<]+)</a></strong>`)
 
-func GetClothes(a *Conditions) ([]string, error) {
+func GetClothesURL(a *Conditions) (*url.URL, error) {
 	u, err := url.Parse("http://www.runnersworld.com/what-to-wear")
 	if err != nil {
 		return nil, err
 	}
 
+	v := url.Values{}
+	v.Set("gender", a.Gender)
+	v.Set("temp", GetTemp(a.Temp))
+	v.Set("conditions", a.Conditions)
+	v.Set("wind", a.Wind)
+	v.Set("time", a.Time)
+	v.Set("intensity", a.Intensity)
+	v.Set("feel", a.Feel)
+	u.RawQuery = v.Encode()
+
+	return u, nil
+}
+
+func GetClothes(a *Conditions) ([]string, error) {
 	if a.Time == "current" {
 		a.Time = GetTime()
+	}
+
+	u, err := GetClothesURL(a)
+	if err != nil {
+		return nil, err
 	}
 
 	v := url.Values{}
