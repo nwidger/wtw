@@ -11,7 +11,7 @@ import (
 	"github.com/nwidger/wtw"
 )
 
-func getClothes() {
+func getClothes() bool {
 	go func() {
 		var (
 			tempInt int
@@ -76,6 +76,8 @@ func getClothes() {
 
 		document.Set("location", u.String())
 	}()
+
+	return false
 }
 
 func main() {
