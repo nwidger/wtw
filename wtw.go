@@ -270,7 +270,6 @@ func GetWeather(location string, a *Conditions) error {
 		return err
 	}
 	defer resp.Body.Close()
-	defer io.Copy(ioutil.Discard, resp.Body)
 
 	if resp.StatusCode != http.StatusOK {
 		return fmt.Errorf("%s", http.StatusText(resp.StatusCode))
