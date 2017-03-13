@@ -33,14 +33,14 @@ $ go get -u github.com/nwidger/wtw/cmd/wtw
    go get -d -u github.com/nwidger/wtw
    ```
 
-3. Build `docs/main_js.js`
+3. Build `js/main_js.js`
 
    ```
    cd $GOPATH/src/github.com/nwidger/wtw
-   GOARCH=js gopherjs build github.com/nwidger/wtw/docs -m -o docs/main_js.js
+   GOARCH=js gopherjs build github.com/nwidger/wtw/js -m -o js/main_js.js
    ```
 
-4. Open `docs/index.html` in your browser.
+4. Open `js/index.html` in your browser.
 
 ## Usage
 
