@@ -46,6 +46,8 @@ $ go get -u github.com/nwidger/wtw/cmd/wtw
 
 ```
 Usage of wtw:
+  -browser
+    	open answer in the browser
   -conditions string
     	c (clear), pc (partly cloudy), o (overcast), r (heavy rain), lr (light rain) or s (snowing) (default "c")
   -feel string

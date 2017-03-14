@@ -6,6 +6,7 @@ import (
 	"os"
 
 	"github.com/nwidger/wtw"
+	"github.com/pkg/browser"
 )
 
 func main() {
@@ -19,6 +20,7 @@ func main() {
 		Feel:       "ib",
 	}
 	location := ""
+	openBrowser := false
 	verbose := false
 
 	flag.StringVar(&location, "location", location, "get current conditions for location, overrides -temp, -conditions and -wind")
@@ -29,6 +31,7 @@ func main() {
 	flag.StringVar(&a.Time, "time", a.Time, "dawn, day, dusk, night or current")
 	flag.StringVar(&a.Intensity, "intensity", a.Intensity, "n (easy run), lr (long run), h (hard workout) or r (race)")
 	flag.StringVar(&a.Feel, "feel", a.Feel, "c (cool), ib (in between) or w (warm)")
+	flag.BoolVar(&openBrowser, "browser", openBrowser, "open answer in the browser")
 	flag.BoolVar(&verbose, "v", verbose, "print conditions before answer")
 
 	flag.Parse()
@@ -38,6 +41,10 @@ func main() {
 		fmt.Fprintf(os.Stderr, "%s\n", err.Error())
 		flag.Usage()
 		os.Exit(1)
+	}
+
+	if a.Time == "current" {
+		a.Time = wtw.GetTime()
 	}
 
 	if len(location) > 0 {
@@ -54,13 +61,27 @@ func main() {
 			a.Wind, a.Time, a.Intensity, a.Feel)
 	}
 
-	clothes, err := wtw.GetClothes(a)
-	if err != nil {
-		fmt.Println(err)
-		os.Exit(1)
-	}
+	if openBrowser {
+		u, err := wtw.GetClothesURL(a)
+		if err != nil {
+			fmt.Fprintf(os.Stderr, "error getting url: %s\n", err.Error())
+			os.Exit(1)
+		}
 
-	for _, c := range clothes {
-		fmt.Printf("%s\n", c)
+		err = browser.OpenURL(u.String())
+		if err != nil {
+			fmt.Fprintf(os.Stderr, "error opening url: %s\n", err.Error())
+			os.Exit(1)
+		}
+	} else {
+		clothes, err := wtw.GetClothes(a)
+		if err != nil {
+			fmt.Println(err)
+			os.Exit(1)
+		}
+
+		for _, c := range clothes {
+			fmt.Printf("%s\n", c)
+		}
 	}
 }
